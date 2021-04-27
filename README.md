@@ -1,4 +1,4 @@
-# Just some interview exerciseh
+# Just some interview exercises
 
 Most should be ran using ```npm run test```
 
