@@ -36,26 +36,37 @@ const alphabet = 'abcdefghijklmnopqrstuvwyxz';
 const consonants = alphabet.replace(/[aeiou]/im, '');
 const vowels = 'aeiou';
 
-// This looks like fun
 const soundex = (string) => {
   let consistentSoundString = '';
-  // replace same sounding
   string = string.replace(/ck/im, 'c');
 
-  // grab initial char
   const stringArray = Array.from(string);
   let wordKey = stringArray.shift();
 
-  // remove vowels
-  string = string.replace(/[aeiou]/im, '');
+  string = string.replace(/[aeiouywh]+/gim, '');
 
-  console.log(string);
-  let mappedResult;
+  let replacedWord = string.slice(1, string.length);
+  for (let i = 0 ; i < 3 ; i++) {
+    if (i == 2) {
+      continue;
+    }
+    replacedWord = replacedWord.replace(/[bfpv]+/gim, 1);
+    replacedWord = replacedWord.replace(/[cgjkqsxz]+/gim, 2);
+    replacedWord = replacedWord.replace(/[dt]+/gim, 3);
+    replacedWord = replacedWord.replace(/[l]+/gim, 4);
+    replacedWord = replacedWord.replace(/[mn]+/gim, 5);
+    replacedWord = replacedWord.replace(/[r]+/gim, 6);
+
+    if(replacedWord.length < 3) {
+      replacedWord += 0;
+    }
+  }
+
+  const mappedResult = `${wordKey}${replacedWord}`;
+  //  console.log({string, wordKey, replacedWord, mappedResult});
 
 
-  console.log(wordKey);
-  //const simplifiedArray = stringArray.map(
+  return mappedResult;
 };
 
-soundex('MackD');
-//module.exports = soundex;
+module.exports = soundex;
