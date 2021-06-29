@@ -1,16 +1,17 @@
 import Emitter from 'events';
+import conf from './config.js';
 
+const events = conf.events;
+const Emtr = new Emitter();
 
-const emtr = new Emitter();
-
-emtr.on('greet', function() {
+Emtr.on(events.GREET, function() {
   console.log('Somewhere, someone said hello');
 });
 
-emtr.on('greet', function() {
+Emtr.on(events.GREET, function() {
   console.log('A greeting event was listened');
 });
 
-console.log('Hello');
+console.log('App Run...');
 
-emtr.emit('greet');
+Emtr.emit(events.GREET);
