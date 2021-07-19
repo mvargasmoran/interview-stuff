@@ -30,6 +30,9 @@ def formatElapsedTime(seconds):
     for timeUnit in timeUnits:
         result = seconds / timeUnit
         # print("result", result, seconds)
+        if seconds < 1:
+            results.append(float(seconds))
+            break
         if float(result) >= 1 :
             if(int(seconds) > 60):
                 results.append(int(result))
@@ -46,6 +49,7 @@ def formatElapsedTime(seconds):
         "Hours",
         "Minutes",
         "Seconds",
+        #"miliseconds",
         ]
 
     sliceStart = len(friendlyTimeMeasuresBase)-len(results)
@@ -59,8 +63,9 @@ def formatElapsedTime(seconds):
 
     return formatted;
 
-testInput = 90061.1404271125793457
 testInput = 694861.9404271125793457
+testInput = 60.9404271125793457
+testInput = 90061.1404271125793457
 # print(testInput % 1)
 
 testOutput = formatElapsedTime(testInput)
