@@ -29,7 +29,6 @@ def formatElapsedTime(seconds):
 
     for timeUnit in timeUnits:
         result = seconds / timeUnit
-        # print("result", result, seconds)
         if seconds < 1:
             results.append(float(seconds))
             break
