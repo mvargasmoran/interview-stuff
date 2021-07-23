@@ -3,49 +3,60 @@
 
   let lastInput = Date.now();
   let autoSaveTimer;
+  let productQuantity = 1;
+  let productName = 'Bacon';
+  let autosaveStatusDefault = 'autosaving-alert';
+  let autosaveStatus = autosaveStatusDefault;
 
-  function serverStuff(data){
-    setTimeout(function () {
-      return {
-        message: "demo"
-      };
-    }, 1000);
+  let serverStuff = (data) => {
+
+    return new Promise(resolve => {
+      console.log({data});
+      setTimeout(resolve, 1000);
+    });
   }
 
-  $: savedAlert = document.getElementById('saved-alert');
-  function autoSave(){
+  async function autoSave(){
     let rightNow = Date.now();
     console.log({rightNow, lastInput});
 
     let timeSinceLastInput = (rightNow - lastInput);
     let shouldAutoSave = timeSinceLastInput >= 2000;
+
     if(shouldAutoSave) {
-      console.log('Im going to auto-save, you are idle')
-      data = {
-        product: 'bacon',
-        quantity: targetInput.value,
+      console.log('Idle, auto-saving')
+      let data = {
+        product: productName,
+        quantity: productQuantity,
       };
 
-      let saved = serverStuff(data);
-      savedAlert.classList.add('saved');
-      setTimeout(()=>{
-        savedAlert.classList.remove('saved');
-      }, 1200);
+
+      autosaveStatus = `${autosaveStatusDefault} saving`;
+      await serverStuff(data).then(()=>{
+        console.log('resolved server stuff')
+        autosaveStatus = `${autosaveStatusDefault} saved`;
+        console.log('foobar');
+        setTimeout(() => {
+          console.log('foobar settimeout');
+          //autosaveStatus = autosaveStatusDefault;
+        }, 100);
+      });
     }
   }
 
-  const keyupHandle = () => {
-    console.log('keyup>>>')
+  const idleHandler = () => {
+    console.log('>>>Change')
     lastInput = Date.now();
     clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(autoSave, 2000);
   }
+
 </script>
 
 <main>
   <div class="stylish-form">
     <div class="page-title">
-      <h1>{pageTitle} Buy your Bacon</h1>
+      <h1>{pageTitle}</h1>
     </div>
 
     <div class="image-container">
@@ -54,22 +65,31 @@
 
     <div class="product-name product-info">
       <h2>Bacon</h2>
+      <div>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perspiciatis dolores, neque modi totam nobis unde omnis eum. Vel earum repellendus natus error, soluta quo fuga vitae dolorem pariatur facere voluptas!
+      </div>
     </div>
 
     <div class="input-container product-info">
       <label for="productQuantity">Product Quantity</label>
-      <input id="targetInput" name="productQuantity" type="number" on:keyup={keyupHandle}>
+      <input name="productQuantity"
+      value={productQuantity}
+      type="number"
+      on:change={idleHandler}
+      on:keyup={idleHandler}>
 
-      <div id="saved-alert" class="autosaving-alert">
-        Auto-saving...
+      <div id="saved-alert" class="{autosaveStatus}">
+
+        <span class="autosaving-message">Auto-saving...</span>
+        <span class="saved-message">Saved! :D</span>
       </div>
     </div>
+
   </div>
 </main>
 
-
 <style lang="scss">
-  main {
+    main {
     padding: 1em;
     border: 1px solid hotpink;
     margin: 0 auto;
@@ -81,10 +101,27 @@
     font-style: italic;
     display: inline-block;
     opacity: 0;
+    border-radius: 3px;
+    padding: 2px 6px;
+    color: white;
+    .saved-message, .autosaving-message {
+      display: none;
+    }
     &.saved{
-      animation: AnimationName 1.2s ease infinite;
+      animation: SavedAnimation 1s ease;
       background: linear-gradient(90deg, #71c356, #4a730c);
       background-size: 400% 400%;
+      > .saved-message {
+        display: inline-block;
+      }
+    }
+    &.saving{
+      animation: SavingAnimation 1s ease infinite;
+      background: linear-gradient(90deg, #71c356, #4a730c);
+      background-size: 400% 400%;
+       > .autosaving-message {
+        display: inline-block;
+      }
     }
   }
 
@@ -98,7 +135,7 @@
       outline: 1px solid green;
       background: rgba(10,10, 240,.1);
     }
-  }
+	}
   .page-title{
     text-align: center;
     grid-column: 1 / 4;
@@ -110,6 +147,7 @@
     > img {
       position: relative;
       width: 100%;
+      height: 100%;
     }
   }
   .product-info{
@@ -123,40 +161,63 @@
     grid-column: 2 / 4;
     grid-row: 3 / 5;
   }
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
-  }
+	h1 {
+		color: #ff3e00;
+		text-transform: uppercase;
+		font-size: 4em;
+		font-weight: 100;
+	}
 
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
-    }
-  }
+	@media (min-width: 640px) {
+		main {
+			max-width: none;
+		}
+	}
 
 
-  @keyframes AnimationName {
+@keyframes SavingAnimation {
     0%{
       opacity: 0;
       transform: translateX(-40px);
       background-position:0% 50%;
-    }
+  }
     40%{
       opacity: 1;
       transform: translateX(0px);
       background-position:100% 50%
-    }
-    80%{
+  }
+  80%{
       opacity: 1;
       transform: translateX(0px);
       background-position:100% 50%
-    }
+  }
     100%{
       opacity: 0;
       ransform: translateX(400px);
       background-position:0% 50%
     }
+}
+
+@keyframes SavedAnimation {
+    0%{
+      opacity: 0;
+      transform: translateY(20px);
+      background-position:0% 50%;
   }
+    40%{
+      opacity: 1;
+      transform: translateY(0px);
+      background-position:100% 50%
+  }
+  80%{
+      opacity: 1;
+      transform: translateY(0px);
+      background-position:100% 50%
+  }
+    100%{
+      opacity: 0;
+      ransform: translateY(400px);
+      background-position:0% 50%
+    }
+}
 </style>
